@@ -11,28 +11,20 @@ function::function(command command) noexcept
 function::function(native_function_t function) noexcept
 	: function_(std::move(function))
 {}
-function::function(command command, function* parent) noexcept
-	: function_(std::move(command)), parent_(parent)
-{}
-function::function(native_function_t function, ::function* parent) noexcept
-	: function_(std::move(function)), parent_(parent)
-{}
 function::function(const function& function)
-	: function_(function.function_), parent_(function.parent_)
+	: function_(function.function_)
 {}
 function::function(function&& function) noexcept
-	: function_(std::move(function.function_)), parent_(function.parent_)
-{
-	function.parent_ = nullptr;
-}
+	: function_(std::move(function.function_))
+{}
 
 function& function::operator=(const function& function)
 {
-	return function_ = function.function_, parent_ = function.parent_, *this;
+	return function_ = function.function_, *this;
 }
 function& function::operator=(function&& function) noexcept
 {
-	return function_ = std::move(function.function_), parent_ = function.parent_, function.parent_ = nullptr, *this;
+	return function_ = std::move(function.function_), *this;
 }
 bool operator==(const function& lhs, const function& rhs) noexcept
 {
@@ -60,16 +52,14 @@ bool operator!=(const function& lhs, const function& rhs) noexcept
 void function::clear() noexcept
 {
 	function_ = {};
-	parent_ = nullptr;
 }
 bool function::empty() const noexcept
 {
-	return function_.index() == 0 && parent_ == nullptr;
+	return function_.index() == 0;
 }
 void function::swap(function& other) noexcept
 {
 	function_.swap(other.function_);
-	std::swap(parent_, other.parent_);
 }
 
 function_type function::type() const noexcept
@@ -95,13 +85,4 @@ native_function_t& function::get_as_native_function_t() noexcept
 {
 	assert(function_.index() == 2);
 	return std::get<native_function_t>(function_);
-}
-
-const function& function::parent() const noexcept
-{
-	return *parent_;
-}
-function& function::parent() noexcept
-{
-	return *parent_;
 }

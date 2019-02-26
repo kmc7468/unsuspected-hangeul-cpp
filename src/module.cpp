@@ -18,9 +18,9 @@ void module::add_submodule(module* submodule)
 	submodule->parent_ = this;
 	submodules_.push_back(submodule);
 }
-void module::add_function(function function)
+void module::add_function(std::u16string name, function function)
 {
-	functions_.push_back(std::move(function));
+	functions_.insert(std::make_pair(std::move(name), std::move(function)));
 }
 
 std::u16string module::name() const noexcept
@@ -40,7 +40,7 @@ module* module::parent() noexcept
 	return parent_;
 }
 
-std::vector<function>& module::functions() noexcept
+std::map<std::u16string, function>& module::functions() noexcept
 {
 	return functions_;
 }

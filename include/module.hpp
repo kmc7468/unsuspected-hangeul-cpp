@@ -2,6 +2,7 @@
 
 #include <function.hpp>
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -17,7 +18,7 @@ public:
 
 public:
 	void add_submodule(module* submodule);
-	void add_function(function function);
+	void add_function(std::u16string name, function function);
 
 public:
 	std::u16string name() const noexcept;
@@ -25,12 +26,12 @@ public:
 	const module* parent() const noexcept;
 	module* parent() noexcept;
 
-	std::vector<function>& functions() noexcept;
+	std::map<std::u16string, function>& functions() noexcept;
 
 private:
 	std::u16string name_;
 	std::vector<module*> submodules_;
 	module* parent_ = nullptr;
 
-	std::vector<function> functions_;
+	std::map<std::u16string, function> functions_;
 };

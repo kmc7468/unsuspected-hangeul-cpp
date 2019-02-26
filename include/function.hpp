@@ -27,8 +27,6 @@ public:
 	function() noexcept;
 	explicit function(command command) noexcept;
 	explicit function(native_function_t function) noexcept;
-	function(command command, function* parent) noexcept;
-	function(native_function_t function, ::function* parent) noexcept;
 	function(const function& function);
 	function(function&& function) noexcept;
 	~function() = default;
@@ -51,10 +49,5 @@ public:
 	native_function_t& get_as_native_function_t() noexcept;
 
 public:
-	const function& parent() const noexcept;
-	function& parent() noexcept;
-
-public:
 	std::variant<std::monostate, command, native_function_t> function_;
-	function* parent_ = nullptr;
 };
