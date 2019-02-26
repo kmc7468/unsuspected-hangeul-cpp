@@ -35,6 +35,7 @@ bool operator==(const function& lhs, const function& rhs) noexcept
 	case 0: return true;
 	case 1: return lhs.get_as_command() == rhs.get_as_command();
 	case 2: return lhs.get_as_native_function_t().target<native_function_ptr_t>() == rhs.get_as_native_function_t().target<native_function_ptr_t>();
+	default: return true; // Dummy
 	}
 }
 bool operator!=(const function& lhs, const function& rhs) noexcept
@@ -46,6 +47,7 @@ bool operator!=(const function& lhs, const function& rhs) noexcept
 	case 0: return false;
 	case 1: return lhs.get_as_command() != rhs.get_as_command();
 	case 2: return lhs.get_as_native_function_t().target<native_function_ptr_t>() != rhs.get_as_native_function_t().target<native_function_ptr_t>();
+	default: return true; // Dummy
 	}
 }
 

@@ -41,6 +41,7 @@ bool operator==(const object& lhs, const object& rhs) noexcept
 	case 0: return true;
 	case 1: return lhs.get_as_number() == rhs.get_as_number();
 	case 2: return lhs.get_as_function() == rhs.get_as_function();
+	default: return true; // Dummy
 	}
 }
 bool operator!=(const object& lhs, const object& rhs) noexcept
@@ -52,6 +53,7 @@ bool operator!=(const object& lhs, const object& rhs) noexcept
 	case 0: return false;
 	case 1: return lhs.get_as_number() != rhs.get_as_number();
 	case 2: return lhs.get_as_function() != rhs.get_as_function();
+	default: return true; // Dummy
 	}
 }
 

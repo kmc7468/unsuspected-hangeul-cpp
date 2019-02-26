@@ -8,16 +8,16 @@ enum class command_type
 {
 	none,
 
-	r,
-	s,
-	e,
-	f,
-	a,
-	q,
-	t,
-	d,
-	w,
-	g,
+	r, // 丑
+	s, // 中
+	e, // 之
+	f, // 予
+	a, // 仃
+	q, // 仆
+	t, // 今
+	w, // 元
+	d, // 仄
+	g, // 冗
 };
 
 class command final
