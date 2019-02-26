@@ -1,5 +1,7 @@
 #include <command.hpp>
 
+#include <encoder.hpp>
+
 #include <algorithm>
 #include <utility>
 
@@ -101,4 +103,71 @@ command::const_reverse_iterator command::rend() const noexcept
 command::const_reverse_iterator command::crend() const noexcept
 {
 	return commands_.crend();
+}
+
+command command::parse(const std::u16string& code)
+{
+	command command;
+	std::vector<command_type>& result = command.commands_;
+
+	for (std::size_t i = 0; i < code.size(); ++i)
+	{
+		const char16_t c = code[i];
+		const bool is_high_surrogate = ::is_high_surrogate(c);
+
+		if ((is_high_surrogate || !is_hangul(c)) && result.size() && result.back() != command_type::none)
+		{
+			result.push_back(command_type::none);
+			if (is_high_surrogate) ++i;
+		}
+		else
+		{
+			static const auto to_command_type = [](char16_t c)
+			{
+				switch (c)
+				{
+				case u'丑': return command_type::r;
+				case u'中': return command_type::s;
+				case u'之': return command_type::e;
+				case u'予': return command_type::f;
+				case u'仃': return command_type::a;
+				case u'仆': return command_type::q;
+				case u'今': return command_type::t;
+				case u'仄': return command_type::d;
+				case u'元': return command_type::w;
+				case u'冗': return command_type::g;
+				}
+			};
+			const char32_t temp = get_chosung(c);
+
+			if (const char16_t first = static_cast<char16_t>(temp >> 16); first)
+			{
+				const char16_t second = static_cast<char16_t>(temp & 0xFFFF);
+
+				const command_type first_t = to_command_type(first),
+								   second_t = to_command_type(second);
+				const bool is_first_t_insert_space = first_t == command_type::d || first_t == command_type::g,
+						   is_second_t_insert_space = second_t == command_type::d || second_t == command_type::g;
+
+				if (result.size() && result.back() != command_type::none && is_first_t_insert_space) result.push_back(command_type::none);
+				result.push_back(first_t);
+				if (result.back() != command_type::none && is_second_t_insert_space) result.push_back(command_type::none);
+				result.push_back(second_t);
+			}
+			else
+			{
+				const command_type t = to_command_type(static_cast<char16_t>(temp));
+				const bool is_t_insert_space = t == command_type::d || t == command_type::g;
+
+				if (result.size() && result.back() != command_type::none && is_t_insert_space) result.push_back(command_type::none);
+				result.push_back(t);
+			}
+		}
+	}
+
+	if (result.size() && result.back() == command_type::none)
+	{
+		result.erase(result.end() - 1);
+	}
+	return command;
 }

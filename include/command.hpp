@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <string>
 #include <vector>
 
 enum class command_type
@@ -13,7 +14,9 @@ enum class command_type
 	f,
 	a,
 	q,
+	t,
 	d,
+	w,
 	g,
 };
 
@@ -60,4 +63,7 @@ public:
 	
 private:
 	std::vector<command_type> commands_;
+
+public:
+	static command parse(const std::u16string& code);
 };
