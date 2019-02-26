@@ -11,6 +11,7 @@ class object;
 using native_function_param_t = std::vector<object>;
 using native_function_res_t = object;
 using native_function_t = std::function<native_function_res_t(const native_function_param_t&)>;
+using native_function_ptr_t = native_function_res_t(native_function_param_t);
 
 enum class function_type
 {
@@ -35,6 +36,8 @@ public:
 public:
 	function& operator=(const function& function);
 	function& operator=(function&& function) noexcept;
+	friend bool operator==(const function& lhs, const function& rhs) noexcept;
+	friend bool operator!=(const function& lhs, const function& rhs) noexcept;
 
 public:
 	void clear() noexcept;

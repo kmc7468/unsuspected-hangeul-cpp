@@ -34,6 +34,28 @@ function& function::operator=(function&& function) noexcept
 {
 	return function_ = std::move(function.function_), parent_ = function.parent_, function.parent_ = nullptr, *this;
 }
+bool operator==(const function& lhs, const function& rhs) noexcept
+{
+	if (lhs.function_.index() != rhs.function_.index()) return false;
+	
+	switch (lhs.function_.index())
+	{
+	case 0: return true;
+	case 1: return lhs.get_as_command() == rhs.get_as_command();
+	case 2: return lhs.get_as_native_function_t().target<native_function_ptr_t>() == rhs.get_as_native_function_t().target<native_function_ptr_t>();
+	}
+}
+bool operator!=(const function& lhs, const function& rhs) noexcept
+{
+	if (lhs.function_.index() != rhs.function_.index()) return true;
+
+	switch (lhs.function_.index())
+	{
+	case 0: return false;
+	case 1: return lhs.get_as_command() != rhs.get_as_command();
+	case 2: return lhs.get_as_native_function_t().target<native_function_ptr_t>() != rhs.get_as_native_function_t().target<native_function_ptr_t>();
+	}
+}
 
 void function::clear() noexcept
 {

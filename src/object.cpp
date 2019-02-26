@@ -32,6 +32,28 @@ object& object::operator=(object&& object) noexcept
 {
 	return value_ = std::move(object.value_), *this;
 }
+bool operator==(const object& lhs, const object& rhs) noexcept
+{
+	if (lhs.value_.index() != rhs.value_.index()) return false;
+	
+	switch (lhs.value_.index())
+	{
+	case 0: return true;
+	case 1: return lhs.get_as_number() == rhs.get_as_number();
+	case 2: return lhs.get_as_function() == rhs.get_as_function();
+	}
+}
+bool operator!=(const object& lhs, const object& rhs) noexcept
+{
+	if (lhs.value_.index() != rhs.value_.index()) return true;
+
+	switch (lhs.value_.index())
+	{
+	case 0: return false;
+	case 1: return lhs.get_as_number() != rhs.get_as_number();
+	case 2: return lhs.get_as_function() != rhs.get_as_function();
+	}
+}
 
 void object::clear() noexcept
 {

@@ -34,6 +34,8 @@ public:
 public:
 	command& operator=(const command& command);
 	command& operator=(command&& command) noexcept;
+	friend bool operator==(const command& lhs, const command& rhs) noexcept;
+	friend bool operator!=(const command& lhs, const command& rhs) noexcept;
 	command_type operator[](std::size_t index) const noexcept;
 	command_type& operator[](std::size_t index) noexcept;
 

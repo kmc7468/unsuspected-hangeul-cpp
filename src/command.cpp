@@ -1,5 +1,6 @@
 #include <command.hpp>
 
+#include <algorithm>
 #include <utility>
 
 command::command(const command& command)
@@ -16,6 +17,16 @@ command& command::operator=(const command& command)
 command& command::operator=(command&& command) noexcept
 {
 	return commands_ = std::move(command.commands_), *this;
+}
+bool operator==(const command& lhs, const command& rhs) noexcept
+{
+	if (lhs.commands_.size() != rhs.commands_.size()) return false;
+	else return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+bool operator!=(const command& lhs, const command& rhs) noexcept
+{
+	if (lhs.commands_.size() != rhs.commands_.size()) return true;
+	else return !std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 command_type command::operator[](std::size_t index) const noexcept
 {

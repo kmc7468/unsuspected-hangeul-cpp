@@ -27,6 +27,8 @@ public:
 	object& operator=(function function) noexcept;
 	object& operator=(const object& object);
 	object& operator=(object&& object) noexcept;
+	friend bool operator==(const object& lhs, const object& rhs) noexcept;
+	friend bool operator!=(const object& lhs, const object& rhs) noexcept;
 
 public:
 	void clear() noexcept;
