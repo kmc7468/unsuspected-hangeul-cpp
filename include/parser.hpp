@@ -1,8 +1,10 @@
 #pragma once
 
+#include <command.hpp>
 #include <module.hpp>
 
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -131,4 +133,19 @@ public:
 public:
 	::module* module;
 	std::u16string name;
+};
+
+class parser final
+{
+public:
+	parser() = delete;
+	parser(const parser&) = delete;
+	~parser() = delete;
+
+public:
+	parser& operator=(const parser&) = delete;
+
+public:
+	static std::vector<command> make_words(const command& command);
+	static node_ptr parse(const std::vector<command>& words);
 };

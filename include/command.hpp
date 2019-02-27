@@ -30,6 +30,7 @@ public:
 
 public:
 	command() noexcept = default;
+	command(const_iterator begin, const_iterator end);
 	command(const command& command);
 	command(command&& command) noexcept;
 	~command() = default;
@@ -61,6 +62,12 @@ public:
 	const_reverse_iterator rend() const noexcept;
 	const_reverse_iterator crend() const noexcept;
 	
+	bool is_integer_literal() const noexcept;
+	bool is_function_defining() const noexcept;
+	bool is_function_calling() const noexcept;
+	bool is_recursive_function() const noexcept;
+	bool is_argument() const noexcept;
+
 private:
 	std::vector<command_type> commands_;
 

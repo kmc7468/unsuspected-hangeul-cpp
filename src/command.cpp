@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <utility>
 
+command::command(const_iterator begin, const_iterator end)
+	: commands_(begin, end)
+{}
 command::command(const command& command)
 	: commands_(command.commands_)
 {}
@@ -105,6 +108,31 @@ command::const_reverse_iterator command::crend() const noexcept
 	return commands_.crend();
 }
 
+bool command::is_integer_literal() const noexcept
+{
+	for (command_type cmd : *this)
+	{
+		if (command_type::r > cmd || cmd > command_type::w) return false;
+	}
+	return true;
+}
+bool command::is_function_defining() const noexcept
+{
+	return commands_.size() == 1 && commands_.front() == command_type::g;
+}
+bool command::is_function_calling() const noexcept
+{
+	return commands_.size() >= 2 && commands_.front() == command_type::g && command(commands_.begin() + 1, commands_.end()).is_integer_literal();
+}
+bool command::is_recursive_function() const noexcept
+{
+	return commands_.size() == 1 && commands_.front() == command_type::d;
+}
+bool command::is_argument() const noexcept
+{
+	return commands_.size() >= 2 && commands_.front() == command_type::d && command(commands_.begin() + 1, commands_.end()).is_integer_literal();
+}
+
 command command::parse(const std::u16string& code)
 {
 	command command;
@@ -136,6 +164,7 @@ command command::parse(const std::u16string& code)
 				case u'¤·': return command_type::d;
 				case u'¤¸': return command_type::w;
 				case u'¤¾': return command_type::g;
+				default: return command_type::none; // Dummy
 				}
 			};
 			const char32_t temp = get_chosung(c);
