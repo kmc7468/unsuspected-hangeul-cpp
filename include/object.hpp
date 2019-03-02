@@ -10,6 +10,7 @@ enum class object_type
 
 	number,
 	function,
+	boolean,
 };
 
 class object final
@@ -18,6 +19,7 @@ public:
 	object() noexcept = default;
 	object(double number) noexcept;
 	object(function function) noexcept;
+	object(bool boolean) noexcept;
 	object(const object& object);
 	object(object&& object) noexcept;
 	~object() = default;
@@ -25,6 +27,7 @@ public:
 public:
 	object& operator=(double number) noexcept;
 	object& operator=(function function) noexcept;
+	object& operator=(bool boolean) noexcept;
 	object& operator=(const object& object);
 	object& operator=(object&& object) noexcept;
 	friend bool operator==(const object& lhs, const object& rhs) noexcept;
@@ -40,7 +43,13 @@ public:
 	double& get_as_number() noexcept;
 	function get_as_function() const noexcept;
 	function& get_as_function() noexcept;
+	bool get_as_boolean() const noexcept;
+	bool& get_as_boolean() noexcept;
 
 private:
-	std::variant<std::monostate, double, function> value_;
+	std::variant<std::monostate, double, function, bool> value_;
+
+public:
+	static const object true_object;
+	static const object false_object;
 };

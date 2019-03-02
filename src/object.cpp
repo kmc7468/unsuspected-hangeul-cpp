@@ -9,6 +9,9 @@ object::object(double number) noexcept
 object::object(function function) noexcept
 	: value_(std::move(function))
 {}
+object::object(bool boolean) noexcept
+	: value_(boolean)
+{}
 object::object(const object& object)
 	: value_(object.value_)
 {}
@@ -24,6 +27,10 @@ object& object::operator=(function function) noexcept
 {
 	return value_ = std::move(function), *this;
 }
+object& object::operator=(bool boolean) noexcept
+{
+	return value_ = boolean, *this;
+}
 object& object::operator=(const object& object)
 {
 	return value_ = object.value_, *this;
@@ -38,9 +45,8 @@ bool operator==(const object& lhs, const object& rhs) noexcept
 	
 	switch (lhs.value_.index())
 	{
-	case 0: return true;
 	case 1: return lhs.get_as_number() == rhs.get_as_number();
-	case 2: return lhs.get_as_function() == rhs.get_as_function();
+	case 3: return lhs.get_as_boolean() == rhs.get_as_boolean();
 	default: return true; // Dummy
 	}
 }
@@ -50,9 +56,8 @@ bool operator!=(const object& lhs, const object& rhs) noexcept
 
 	switch (lhs.value_.index())
 	{
-	case 0: return false;
 	case 1: return lhs.get_as_number() != rhs.get_as_number();
-	case 2: return lhs.get_as_function() != rhs.get_as_function();
+	case 3: return lhs.get_as_boolean() != rhs.get_as_boolean();
 	default: return true; // Dummy
 	}
 }
@@ -94,3 +99,16 @@ function& object::get_as_function() noexcept
 	assert(type() == object_type::function);
 	return std::get<function>(value_);
 }
+bool object::get_as_boolean() const noexcept
+{
+	assert(type() == object_type::boolean);
+	return std::get<bool>(value_);
+}
+bool& object::get_as_boolean() noexcept
+{
+	assert(type() == object_type::boolean);
+	return std::get<bool>(value_);
+}
+
+const object object::true_object = true;
+const object object::false_object = false;

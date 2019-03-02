@@ -23,30 +23,30 @@ void uh_status::reset()
 {
 	root_module_ = std::unique_ptr<module>(new module(u""));
 
-	root_module_->add_function(u"¤¡", function([](const native_function_param_t& args) -> native_function_res_t
+	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t& args) -> native_function_res_t
 	{
 		const object& lhs = args[0];
 		const object& rhs = args[1];
 
-		if (lhs.type() != rhs.type() || lhs.type() != object_type::number) return 0; // TODO: Exception Handling
+		if (lhs.type() != rhs.type() || lhs.type() != object_type::number) return 0.; // TODO: Exception Handling
 		
 		return lhs.get_as_number() * rhs.get_as_number();
 	}));
-	root_module_->add_function(u"¤§", function([](const native_function_param_t & args) -> native_function_res_t
+	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t & args) -> native_function_res_t
 	{
 		const object& lhs = args[0];
 		const object& rhs = args[1];
 
-		if (lhs.type() != rhs.type() || lhs.type() != object_type::number) return 0; // TODO: Exception Handling
+		if (lhs.type() != rhs.type() || lhs.type() != object_type::number) return 0.; // TODO: Exception Handling
 		
 		return lhs.get_as_number() + rhs.get_as_number();
 	}));
-	root_module_->add_function(u"¤µ", function([](const native_function_param_t & args) -> native_function_res_t
+	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t & args) -> native_function_res_t
 	{
 		const object& lhs = args[0];
 		const object& rhs = args[1];
 
-		if (lhs.type() != rhs.type() || lhs.type() != object_type::number) return 0; // TODO: Exception Handling
+		if (lhs.type() != rhs.type() || lhs.type() != object_type::number) return 0.; // TODO: Exception Handling
 		
 		return std::pow(lhs.get_as_number(), rhs.get_as_number());
 	}));

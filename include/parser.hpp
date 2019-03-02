@@ -1,7 +1,6 @@
 #pragma once
 
 #include <command.hpp>
-#include <module.hpp>
 
 #include <memory>
 #include <ostream>
@@ -16,9 +15,11 @@ enum class node_type
 	function_defining,
 	function_calling,
 	recursive_function,
-	arugment,
+	argument,
 	identifier,
 };
+
+class module;
 
 class node
 {

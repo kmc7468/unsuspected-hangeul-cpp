@@ -1,8 +1,10 @@
 #include <parser.hpp>
 
+#include <module.hpp>
+
 #include <algorithm>
 #include <cstddef>
-#include <deque>
+#include <stack>
 #include <utility>
 
 node::node(node_type type) noexcept
@@ -34,7 +36,7 @@ recursive_function_node::recursive_function_node(node_ptr number) noexcept
 {}
 
 argument_node::argument_node(node_ptr index, node_ptr function_number) noexcept
-	: node(node_type::arugment), index(std::move(index)), function_number(std::move(function_number))
+	: node(node_type::argument), index(std::move(index)), function_number(std::move(function_number))
 {}
 
 identifier_node::identifier_node(::module* module, std::u16string name) noexcept
@@ -63,10 +65,10 @@ std::vector<command> parser::make_words(const command& command)
 }
 node_ptr parser::parse(const std::vector<command>& words)
 {
-	static const auto pop_back_nodes = [](std::deque<node_ptr>& nodes)
+	static const auto pop = [](std::stack<node_ptr>& nodes)
 	{
-		const node_ptr temp = nodes.back();
-		return nodes.pop_back(), temp;
+		const node_ptr temp = nodes.top();
+		return nodes.pop(), temp;
 	};
 	static const auto parse_integer_literal = [](command::const_iterator begin, command::const_iterator end) -> long long
 	{
@@ -81,7 +83,7 @@ node_ptr parser::parse(const std::vector<command>& words)
 		return sign * result;
 	};
 
-	std::deque<node_ptr> nodes;
+	std::stack<node_ptr> nodes;
 
 	for (auto word_iter = words.begin(); word_iter < words.end(); ++word_iter)
 	{
@@ -93,42 +95,42 @@ node_ptr parser::parse(const std::vector<command>& words)
 
 			if (next_word_iter->is_argument())
 			{
-				nodes.push_back(std::make_shared<argument_node>(
+				nodes.push(std::make_shared<argument_node>(
 					std::move(lit), std::make_shared<integer_literal_node>(parse_integer_literal(next_word_iter->begin() + 1, next_word_iter->end()))));
 				++word_iter;
 			}
 			else if (next_word_iter->is_recursive_function())
 			{
-				nodes.push_back(std::make_shared<recursive_function_node>(std::move(lit)));
+				nodes.push(std::make_shared<recursive_function_node>(std::move(lit)));
 				++word_iter;
 			}
 			else
 			{
 			push_integer_literal:
-				nodes.push_back(std::move(lit));
+				nodes.push(std::move(lit));
 			}
 		}
 		else if (word_iter->is_function_defining())
 		{
-			nodes.push_back(std::make_shared<function_defining_node>(pop_back_nodes(nodes)));
+			nodes.push(std::make_shared<function_defining_node>(pop(nodes)));
 		}
 		else if (word_iter->is_function_calling())
 		{
 			const std::shared_ptr<integer_literal_node> argument_size =
 				std::make_shared<integer_literal_node>(parse_integer_literal(word_iter->begin() + 1, word_iter->end()));
-			const node_ptr function = pop_back_nodes(nodes);
+			const node_ptr function = pop(nodes);
 			std::vector<node_ptr> arguments;
 
 			for (long long i = 0; i < argument_size->value; ++i)
 			{
-				arguments.push_back(pop_back_nodes(nodes));
+				arguments.push_back(pop(nodes));
 			}
 			std::reverse(arguments.begin(), arguments.end());
 
-			nodes.push_back(std::make_shared<function_calling_node>(std::move(arguments), std::move(function)));
+			nodes.push(std::make_shared<function_calling_node>(std::move(arguments), std::move(function)));
 		}
 	}
 
-	if (nodes.size() == 1) return nodes.front();
+	if (nodes.size() == 1) return nodes.top();
 	else return nullptr;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <command.hpp>
+#include <parser.hpp>
 
 #include <functional>
 #include <variant>
@@ -25,7 +25,7 @@ class function final
 {
 public:
 	function() noexcept;
-	explicit function(command command) noexcept;
+	explicit function(node_ptr function) noexcept;
 	explicit function(native_function_t function) noexcept;
 	function(const function& function);
 	function(function&& function) noexcept;
@@ -34,8 +34,6 @@ public:
 public:
 	function& operator=(const function& function);
 	function& operator=(function&& function) noexcept;
-	friend bool operator==(const function& lhs, const function& rhs) noexcept;
-	friend bool operator!=(const function& lhs, const function& rhs) noexcept;
 
 public:
 	void clear() noexcept;
@@ -43,11 +41,11 @@ public:
 	void swap(function& other) noexcept;
 	
 	function_type type() const noexcept;
-	const command& get_as_command() const noexcept;
-	command& get_as_command() noexcept;
+	const node_ptr& get_as_node_ptr() const noexcept;
+	node_ptr& get_as_node_ptr() noexcept;
 	const native_function_t& get_as_native_function_t() const noexcept;
 	native_function_t& get_as_native_function_t() noexcept;
 
 public:
-	std::variant<std::monostate, command, native_function_t> function_;
+	std::variant<std::monostate, node_ptr, native_function_t> function_;
 };

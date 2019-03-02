@@ -5,7 +5,7 @@
 
 function::function() noexcept
 {}
-function::function(command command) noexcept
+function::function(node_ptr command) noexcept
 	: function_(std::move(command))
 {}
 function::function(native_function_t function) noexcept
@@ -26,30 +26,6 @@ function& function::operator=(function&& function) noexcept
 {
 	return function_ = std::move(function.function_), *this;
 }
-bool operator==(const function& lhs, const function& rhs) noexcept
-{
-	if (lhs.function_.index() != rhs.function_.index()) return false;
-	
-	switch (lhs.function_.index())
-	{
-	case 0: return true;
-	case 1: return lhs.get_as_command() == rhs.get_as_command();
-	case 2: return lhs.get_as_native_function_t().target<native_function_ptr_t>() == rhs.get_as_native_function_t().target<native_function_ptr_t>();
-	default: return true; // Dummy
-	}
-}
-bool operator!=(const function& lhs, const function& rhs) noexcept
-{
-	if (lhs.function_.index() != rhs.function_.index()) return true;
-
-	switch (lhs.function_.index())
-	{
-	case 0: return false;
-	case 1: return lhs.get_as_command() != rhs.get_as_command();
-	case 2: return lhs.get_as_native_function_t().target<native_function_ptr_t>() != rhs.get_as_native_function_t().target<native_function_ptr_t>();
-	default: return true; // Dummy
-	}
-}
 
 void function::clear() noexcept
 {
@@ -68,15 +44,15 @@ function_type function::type() const noexcept
 {
 	return static_cast<function_type>(function_.index());
 }
-const command& function::get_as_command() const noexcept
+const node_ptr& function::get_as_node_ptr() const noexcept
 {
 	assert(function_.index() == 1);
-	return std::get<command>(function_);
+	return std::get<node_ptr>(function_);
 }
-command& function::get_as_command() noexcept
+node_ptr& function::get_as_node_ptr() noexcept
 {
 	assert(function_.index() == 1);
-	return std::get<command>(function_);
+	return std::get<node_ptr>(function_);
 }
 const native_function_t& function::get_as_native_function_t() const noexcept
 {
