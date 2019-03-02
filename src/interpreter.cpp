@@ -57,6 +57,16 @@ void uh_status::swap(uh_status& status) noexcept
 	root_module_.swap(status.root_module_);
 }
 
+::version uh_status::version() const noexcept
+{
+	return version_;
+}
+
+interpreter::interpreter(::version version)
+{
+	status_.version_ = version;
+}
+
 const uh_status& interpreter::status() const noexcept
 {
 	return status_;
