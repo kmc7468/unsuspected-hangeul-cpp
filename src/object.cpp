@@ -96,8 +96,22 @@ function object::get_as_function() const noexcept
 }
 function& object::get_as_function() noexcept
 {
-	assert(type() == object_type::function);
-	return std::get<function>(value_);
+	assert(type() == object_type::function || type() == object_type::boolean);
+
+	static auto true_function = function([](const native_function_param_t& args) -> native_function_res_t
+	{
+		if (args.size() == 0) return true;
+		else return args[0];
+	});
+	static auto false_function = function([](const native_function_param_t& args) -> native_function_res_t
+	{
+		if (args.size() == 0) return false;
+		else if (args.size() == 1) return args[0];
+		else return args[1];
+	});
+
+	if (type() == object_type::function) return std::get<function>(value_);
+	else return std::get<bool>(value_) ? true_function : false_function;
 }
 bool object::get_as_boolean() const noexcept
 {

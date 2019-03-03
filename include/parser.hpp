@@ -20,6 +20,8 @@ enum class node_type
 };
 
 class module;
+class object;
+class uh_status;
 
 class node
 {
@@ -34,6 +36,9 @@ public:
 	node& operator=(const node&) = delete;
 
 public:
+	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) = 0;
+
+public:
 	node_type type() const noexcept;
 
 private:
@@ -46,7 +51,7 @@ class integer_literal_node final : public node
 {
 public:
 	integer_literal_node() noexcept = default;
-	integer_literal_node(long long value) noexcept;
+	integer_literal_node(long long value, std::u16string original) noexcept;
 	integer_literal_node(const integer_literal_node&) = delete;
 	virtual ~integer_literal_node() override = default;
 
@@ -54,7 +59,11 @@ public:
 	integer_literal_node& operator=(const integer_literal_node&) = delete;
 
 public:
+	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+
+public:
 	long long value = 0;
+	std::u16string original;
 };
 
 class function_defining_node final : public node
@@ -67,6 +76,9 @@ public:
 
 public:
 	function_defining_node& operator=(const function_defining_node&) = delete;
+
+public:
+	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
 
 public:
 	node_ptr body;
@@ -85,6 +97,9 @@ public:
 	function_calling_node& operator=(const function_calling_node&) = delete;
 
 public:
+	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+
+public:
 	std::vector<node_ptr> arguments;
 	node_ptr function;
 };
@@ -101,6 +116,9 @@ public:
 	recursive_function_node& operator=(const recursive_function_node&) = delete;
 
 public:
+	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+
+public:
 	node_ptr number;
 };
 
@@ -114,6 +132,9 @@ public:
 
 public:
 	argument_node& operator=(const argument_node&) = delete;
+
+public:
+	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
 
 public:
 	node_ptr index;
@@ -132,6 +153,9 @@ public:
 	identifier_node& operator=(const identifier_node&) = delete;
 
 public:
+	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+
+public:
 	::module* module;
 	std::u16string name;
 };
@@ -148,5 +172,5 @@ public:
 
 public:
 	static std::vector<command> make_words(const command& command);
-	static node_ptr parse(const std::vector<command>& words);
+	static node_ptr parse(const std::vector<command>& words, module* root_module);
 };

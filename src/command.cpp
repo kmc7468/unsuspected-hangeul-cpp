@@ -148,7 +148,7 @@ command command::parse(const std::u16string& code)
 			result.push_back(command_type::none);
 			if (is_high_surrogate) ++i;
 		}
-		else
+		else if (is_hangul(c))
 		{
 			static const auto to_command_type = [](char16_t c)
 			{

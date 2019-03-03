@@ -3,7 +3,7 @@
 #include <module.hpp>
 
 #include <memory>
-#include <vector>
+#include <optional>
 #include <string>
 
 enum class version
@@ -13,11 +13,27 @@ enum class version
 	latest = v0_3,
 };
 
+class argument_node;
+class function;
+class function_calling_node;
 class interpreter;
+class recursive_function_node;
+class object;
 
 class uh_status final
 {
+	friend class argument_node;
+	friend class function;
+	friend class function_calling_node;
 	friend class interpreter;
+	friend class recursive_function_node;
+
+private:
+	struct function_status
+	{
+		::function function;
+		std::vector<object> arguments;
+	};
 
 public:
 	uh_status(uh_status&& status) noexcept;
@@ -39,6 +55,7 @@ public:
 private:
 	std::unique_ptr<module> root_module_;
 	::version version_ = ::version::latest;
+	std::vector<function_status> call_stack_;
 };
 
 class interpreter final
@@ -51,6 +68,9 @@ public:
 
 public:
 	interpreter& operator=(const interpreter&) = delete;
+
+public:
+	std::optional<object> eval(const std::u16string& code);
 
 public:
 	const uh_status& status() const noexcept;

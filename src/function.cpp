@@ -1,5 +1,8 @@
 #include <function.hpp>
 
+#include <interpreter.hpp>
+#include <object.hpp>
+
 #include <cassert>
 #include <utility>
 
@@ -63,4 +66,14 @@ native_function_t& function::get_as_native_function_t() noexcept
 {
 	assert(function_.index() == 2);
 	return std::get<native_function_t>(function_);
+}
+
+object function::eval(uh_status& status)
+{
+	switch (type())
+	{
+	case function_type::script: return std::static_pointer_cast<function_defining_node>(get_as_node_ptr())->body->eval(status, get_as_node_ptr());
+	case function_type::native: return get_as_native_function_t()(status.call_stack_.back().arguments);
+	default: return {}; // Dummy
+	}
 }

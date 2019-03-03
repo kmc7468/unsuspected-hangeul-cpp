@@ -7,6 +7,7 @@
 #include <vector>
 
 class object;
+class uh_status;
 
 using native_function_param_t = std::vector<object>;
 using native_function_res_t = object;
@@ -45,6 +46,8 @@ public:
 	node_ptr& get_as_node_ptr() noexcept;
 	const native_function_t& get_as_native_function_t() const noexcept;
 	native_function_t& get_as_native_function_t() noexcept;
+
+	object eval(uh_status& status);
 
 public:
 	std::variant<std::monostate, node_ptr, native_function_t> function_;

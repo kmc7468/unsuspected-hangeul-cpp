@@ -27,7 +27,7 @@ void uh_status::reset()
 {
 	root_module_ = std::unique_ptr<module>(new module(u""));
 
-	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t& args) -> native_function_res_t
+	root_module_->add_function(u"¤¡", function([](const native_function_param_t& args) -> native_function_res_t
 	{
 		if (args.size() == 0) return 0.;
 		if (args.size() == 1) return args[0];
@@ -47,7 +47,7 @@ void uh_status::reset()
 
 		return result;
 	}));
-	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t& args) -> native_function_res_t
+	root_module_->add_function(u"¤§", function([](const native_function_param_t& args) -> native_function_res_t
 	{
 		if (args.size() == 0) return 0.;
 		if (args.size() == 1) return args[0];
@@ -67,7 +67,7 @@ void uh_status::reset()
 
 		return result;
 	}));
-	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t& args) -> native_function_res_t
+	root_module_->add_function(u"¤µ", function([](const native_function_param_t& args) -> native_function_res_t
 	{
 		if (args.size() == 0) return 0.;
 		if (args.size() == 1) return args[0];
@@ -78,7 +78,7 @@ void uh_status::reset()
 		if (lhs.type() == object_type::function || rhs.type() == object_type::function) return 0.;
 		else return std::pow(lhs.get_as_number(), rhs.get_as_number());
 	}));
-	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t& args) -> native_function_res_t
+	root_module_->add_function(u"¤¤", function([](const native_function_param_t& args) -> native_function_res_t
 	{
 		if (args.size() < 2) return true;
 
@@ -90,7 +90,7 @@ void uh_status::reset()
 		if (lhs_c.type() != rhs_c.type()) return false;
 		else return lhs_c.get_as_number() == rhs_c.get_as_number();
 	}));
-	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t& args) -> native_function_res_t
+	root_module_->add_function(u"¤¸", function([](const native_function_param_t& args) -> native_function_res_t
 	{
 		if (args.size() < 2) return false;
 
@@ -102,7 +102,7 @@ void uh_status::reset()
 		if (lhs_c.type() != rhs_c.type()) return false;
 		else return lhs_c.get_as_number() < rhs_c.get_as_number();
 	}));
-	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t& args) -> native_function_res_t
+	root_module_->add_function(u"¤±", function([](const native_function_param_t& args) -> native_function_res_t
 	{
 		if (args.size() == 0) return true;
 
@@ -111,15 +111,15 @@ void uh_status::reset()
 
 		return !arg_c.get_as_boolean();
 	}));
-	root_module_->add_function(u"ï¿½ï¿½ï¿½ï¿½", function([](const native_function_param_t&) -> native_function_res_t
+	root_module_->add_function(u"¤¸¤¸", function([](const native_function_param_t&) -> native_function_res_t
 	{
 		return true;
 	}));
-	root_module_->add_function(u"ï¿½ï¿½ï¿½ï¿½", function([](const native_function_param_t&) -> native_function_res_t
+	root_module_->add_function(u"¤¡¤¸", function([](const native_function_param_t&) -> native_function_res_t
 	{
 		return false;
 	}));
-	root_module_->add_function(u"ï¿½ï¿½", function([](const native_function_param_t&) -> native_function_res_t
+	root_module_->add_function(u"¤©", function([](const native_function_param_t&) -> native_function_res_t
 	{
 		std::string line;
 		std::getline(std::cin, line);
@@ -139,6 +139,18 @@ void uh_status::swap(uh_status& status) noexcept
 interpreter::interpreter(::version version)
 {
 	status_.version_ = version;
+}
+
+std::optional<object> interpreter::eval(const std::u16string& code)
+{
+	const command command = ::command::parse(code);
+	const std::vector<::command> words = parser::make_words(command);
+	node_ptr ast = parser::parse(words, status_.root_module_.get());
+
+	if (!ast) return std::nullopt;
+	else if (ast->type() != node_type::function_calling) return std::nullopt;
+	
+	return ast->eval(status_, ast);
 }
 
 const uh_status& interpreter::status() const noexcept
