@@ -1,8 +1,12 @@
 #include <interpreter.hpp>
 
+#include <function.hpp>
 #include <object.hpp>
+#include <parser.hpp>
 
 #include <cmath>
+#include <iostream>
+#include <stack>
 #include <utility>
 
 uh_status::uh_status(uh_status&& status) noexcept
@@ -25,32 +29,102 @@ void uh_status::reset()
 
 	root_module_->add_function(u"��", function([](const native_function_param_t& args) -> native_function_res_t
 	{
-		const object& lhs = args[0];
-		const object& rhs = args[1];
+		if (args.size() == 0) return 0.;
+		if (args.size() == 1) return args[0];
 
-		if (lhs.type() != rhs.type() || lhs.type() != object_type::number) return 0.; // TODO: Exception Handling
-		
-		return lhs.get_as_number() * rhs.get_as_number();
+		double result = 1.;
+
+		for (const auto& arg : args)
+		{
+			switch (arg.type())
+			{
+			case object_type::number: result *= arg.get_as_number(); break;
+			case object_type::boolean: result *= static_cast<double>(arg.get_as_boolean());
+			case object_type::function: return 0.;
+			default: return 0.; // Dummy
+			}
+		}
+
+		return result;
 	}));
-	root_module_->add_function(u"��", function([](const native_function_param_t & args) -> native_function_res_t
+	root_module_->add_function(u"��", function([](const native_function_param_t& args) -> native_function_res_t
 	{
-		const object& lhs = args[0];
-		const object& rhs = args[1];
+		if (args.size() == 0) return 0.;
+		if (args.size() == 1) return args[0];
 
-		if (lhs.type() != rhs.type() || lhs.type() != object_type::number) return 0.; // TODO: Exception Handling
-		
-		return lhs.get_as_number() + rhs.get_as_number();
+		double result = 0.;
+
+		for (const auto& arg : args)
+		{
+			switch (arg.type())
+			{
+			case object_type::number: result += arg.get_as_number(); break;
+			case object_type::boolean: result += static_cast<double>(arg.get_as_boolean());
+			case object_type::function: return 0.;
+			default: return 0.; // Dummy
+			}
+		}
+
+		return result;
 	}));
-	root_module_->add_function(u"��", function([](const native_function_param_t & args) -> native_function_res_t
+	root_module_->add_function(u"��", function([](const native_function_param_t& args) -> native_function_res_t
 	{
+		if (args.size() == 0) return 0.;
+		if (args.size() == 1) return args[0];
+
 		const object& lhs = args[0];
 		const object& rhs = args[1];
 
-		if (lhs.type() != rhs.type() || lhs.type() != object_type::number) return 0.; // TODO: Exception Handling
-		
-		return std::pow(lhs.get_as_number(), rhs.get_as_number());
+		if (lhs.type() == object_type::function || rhs.type() == object_type::function) return 0.;
+		else return std::pow(lhs.get_as_number(), rhs.get_as_number());
 	}));
-	// TODO: Equal, Less
+	root_module_->add_function(u"��", function([](const native_function_param_t& args) -> native_function_res_t
+	{
+		if (args.size() < 2) return true;
+
+		const object& lhs = args[0];
+		const object& rhs = args[1];
+		const object lhs_c = lhs.type() == object_type::boolean ? static_cast<double>(lhs.get_as_boolean()) : lhs;
+		const object rhs_c = rhs.type() == object_type::boolean ? static_cast<double>(rhs.get_as_boolean()) : rhs;
+
+		if (lhs_c.type() != rhs_c.type()) return false;
+		else return lhs_c.get_as_number() == rhs_c.get_as_number();
+	}));
+	root_module_->add_function(u"��", function([](const native_function_param_t& args) -> native_function_res_t
+	{
+		if (args.size() < 2) return false;
+
+		const object& lhs = args[0];
+		const object& rhs = args[1];
+		const object lhs_c = lhs.type() == object_type::boolean ? static_cast<double>(lhs.get_as_boolean()) : lhs;
+		const object rhs_c = rhs.type() == object_type::boolean ? static_cast<double>(rhs.get_as_boolean()) : rhs;
+
+		if (lhs_c.type() != rhs_c.type()) return false;
+		else return lhs_c.get_as_number() < rhs_c.get_as_number();
+	}));
+	root_module_->add_function(u"��", function([](const native_function_param_t& args) -> native_function_res_t
+	{
+		if (args.size() == 0) return true;
+
+		const object& arg = args[0];
+		const object arg_c = arg.type() == object_type::number ? static_cast<bool>(arg.get_as_number()) : arg;
+
+		return !arg_c.get_as_boolean();
+	}));
+	root_module_->add_function(u"����", function([](const native_function_param_t&) -> native_function_res_t
+	{
+		return true;
+	}));
+	root_module_->add_function(u"����", function([](const native_function_param_t&) -> native_function_res_t
+	{
+		return false;
+	}));
+	root_module_->add_function(u"��", function([](const native_function_param_t&) -> native_function_res_t
+	{
+		std::string line;
+		std::getline(std::cin, line);
+		return std::stod(line);
+	}));
 }
 void uh_status::swap(uh_status& status) noexcept
 {

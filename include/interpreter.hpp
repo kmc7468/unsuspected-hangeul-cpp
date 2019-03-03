@@ -2,9 +2,9 @@
 
 #include <module.hpp>
 
-#include <map>
 #include <memory>
 #include <vector>
+#include <string>
 
 enum class version
 {
