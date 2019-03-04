@@ -3,7 +3,6 @@
 #include <command.hpp>
 
 #include <memory>
-#include <ostream>
 #include <string>
 #include <vector>
 
@@ -36,7 +35,7 @@ public:
 	node& operator=(const node&) = delete;
 
 public:
-	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) = 0;
+	virtual object eval(uh_status& status, const std::shared_ptr<node>& current_node) = 0;
 
 public:
 	node_type type() const noexcept;
@@ -59,7 +58,7 @@ public:
 	integer_literal_node& operator=(const integer_literal_node&) = delete;
 
 public:
-	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+	virtual object eval(uh_status& status, const std::shared_ptr<node>& current_node) override;
 
 public:
 	long long value = 0;
@@ -78,7 +77,7 @@ public:
 	function_defining_node& operator=(const function_defining_node&) = delete;
 
 public:
-	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+	virtual object eval(uh_status& status, const std::shared_ptr<node>& current_node) override;
 
 public:
 	node_ptr body;
@@ -97,7 +96,7 @@ public:
 	function_calling_node& operator=(const function_calling_node&) = delete;
 
 public:
-	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+	virtual object eval(uh_status& status, const std::shared_ptr<node>& current_node) override;
 
 public:
 	std::vector<node_ptr> arguments;
@@ -116,7 +115,7 @@ public:
 	recursive_function_node& operator=(const recursive_function_node&) = delete;
 
 public:
-	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+	virtual object eval(uh_status& status, const std::shared_ptr<node>& current_node) override;
 
 public:
 	node_ptr number;
@@ -134,7 +133,7 @@ public:
 	argument_node& operator=(const argument_node&) = delete;
 
 public:
-	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+	virtual object eval(uh_status& status, const std::shared_ptr<node>& current_node) override;
 
 public:
 	node_ptr index;
@@ -153,7 +152,7 @@ public:
 	identifier_node& operator=(const identifier_node&) = delete;
 
 public:
-	virtual object eval(uh_status& status, std::shared_ptr<node> current_node) override;
+	virtual object eval(uh_status& status, const std::shared_ptr<node>& current_node) override;
 
 public:
 	::module* module;

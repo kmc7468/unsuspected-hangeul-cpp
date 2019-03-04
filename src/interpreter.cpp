@@ -6,7 +6,6 @@
 
 #include <cmath>
 #include <iostream>
-#include <stack>
 #include <utility>
 
 uh_status::uh_status(uh_status&& status) noexcept
@@ -36,13 +35,8 @@ void uh_status::reset()
 
 		for (const auto& arg : args)
 		{
-			switch (arg.type())
-			{
-			case object_type::number: result *= arg.get_as_number(); break;
-			case object_type::boolean: result *= static_cast<double>(arg.get_as_boolean());
-			case object_type::function: return 0.;
-			default: return 0.; // Dummy
-			}
+			if (arg.type() == object_type::function) return 0.;
+			else result += arg.cast_as_number().get_as_number();
 		}
 
 		return result;
@@ -56,13 +50,8 @@ void uh_status::reset()
 
 		for (const auto& arg : args)
 		{
-			switch (arg.type())
-			{
-			case object_type::number: result += arg.get_as_number(); break;
-			case object_type::boolean: result += static_cast<double>(arg.get_as_boolean());
-			case object_type::function: return 0.;
-			default: return 0.; // Dummy
-			}
+			if (arg.type() == object_type::function) return 0.;
+			else result += arg.cast_as_number().get_as_number();
 		}
 
 		return result;
@@ -76,7 +65,7 @@ void uh_status::reset()
 		const object& rhs = args[1];
 
 		if (lhs.type() == object_type::function || rhs.type() == object_type::function) return 0.;
-		else return std::pow(lhs.get_as_number(), rhs.get_as_number());
+		else return std::pow(lhs.cast_as_number().get_as_number(), rhs.cast_as_number().get_as_number());
 	}));
 	root_module_->add_function(u"い", function([](const native_function_param_t& args) -> native_function_res_t
 	{
@@ -84,32 +73,29 @@ void uh_status::reset()
 
 		const object& lhs = args[0];
 		const object& rhs = args[1];
-		const object lhs_c = lhs.type() == object_type::boolean ? static_cast<double>(lhs.get_as_boolean()) : lhs;
-		const object rhs_c = rhs.type() == object_type::boolean ? static_cast<double>(rhs.get_as_boolean()) : rhs;
-
-		if (lhs_c.type() != rhs_c.type()) return false;
-		else return lhs_c.get_as_number() == rhs_c.get_as_number();
+		
+		if (lhs.type() == object_type::function || rhs.type() == object_type::function) return false;
+		else return lhs.cast_as_number().get_as_number() == rhs.cast_as_number().get_as_number();
 	}));
 	root_module_->add_function(u"じ", function([](const native_function_param_t& args) -> native_function_res_t
 	{
-		if (args.size() < 2) return false;
+		if (args.size() < 2) return true;
 
 		const object& lhs = args[0];
 		const object& rhs = args[1];
-		const object lhs_c = lhs.type() == object_type::boolean ? static_cast<double>(lhs.get_as_boolean()) : lhs;
-		const object rhs_c = rhs.type() == object_type::boolean ? static_cast<double>(rhs.get_as_boolean()) : rhs;
-
-		if (lhs_c.type() != rhs_c.type()) return false;
-		else return lhs_c.get_as_number() < rhs_c.get_as_number();
+		
+		if (lhs.type() == object_type::function || rhs.type() == object_type::function) return false;
+		else return lhs.cast_as_number().get_as_number() < rhs.cast_as_number().get_as_number();
 	}));
 	root_module_->add_function(u"け", function([](const native_function_param_t& args) -> native_function_res_t
 	{
 		if (args.size() == 0) return true;
 
 		const object& arg = args[0];
-		const object arg_c = arg.type() == object_type::number ? static_cast<bool>(arg.get_as_number()) : arg;
 
-		return !arg_c.get_as_boolean();
+		if (arg.type() == object_type::function) return false;
+		
+		return !arg.cast_as_boolean().get_as_boolean();
 	}));
 	root_module_->add_function(u"じじ", function([](const native_function_param_t&) -> native_function_res_t
 	{

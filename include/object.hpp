@@ -46,6 +46,9 @@ public:
 	bool get_as_boolean() const noexcept;
 	bool& get_as_boolean() noexcept;
 
+	object cast_as_number() const;
+	object cast_as_boolean() const;
+
 private:
 	std::variant<std::monostate, double, function, bool> value_;
 

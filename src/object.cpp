@@ -124,5 +124,22 @@ bool& object::get_as_boolean() noexcept
 	return std::get<bool>(value_);
 }
 
+object object::cast_as_number() const
+{
+	switch (type())
+	{
+	case object_type::boolean: return static_cast<double>(get_as_boolean());
+	default: return *this;
+	}
+}
+object object::cast_as_boolean() const
+{
+	switch (type())
+	{
+	case object_type::number: return static_cast<bool>(get_as_number());
+	default: return *this;
+	}
+}
+
 const object object::true_object = true;
 const object object::false_object = false;

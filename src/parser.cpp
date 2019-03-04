@@ -27,7 +27,7 @@ integer_literal_node::integer_literal_node(long long value, std::u16string origi
 	: node(node_type::integer_literal), value(value), original(original)
 {}
 
-object integer_literal_node::eval(uh_status&, std::shared_ptr<node>)
+object integer_literal_node::eval(uh_status&, const std::shared_ptr<node>&)
 {
 	return object(static_cast<double>(value));
 }
@@ -36,7 +36,7 @@ function_defining_node::function_defining_node(node_ptr body) noexcept
 	: node(node_type::function_defining), body(std::move(body))
 {}
 
-object function_defining_node::eval(uh_status&, std::shared_ptr<node> current_node)
+object function_defining_node::eval(uh_status&, const std::shared_ptr<node>& current_node)
 {
 	return function(current_node);
 }
@@ -48,7 +48,7 @@ function_calling_node::function_calling_node(std::vector<node_ptr> arguments, no
 	: node(node_type::function_calling), arguments(std::move(arguments)), function(std::move(function))
 {}
 
-object function_calling_node::eval(uh_status& status, std::shared_ptr<node> current_node)
+object function_calling_node::eval(uh_status& status, const std::shared_ptr<node>&)
 {
 	std::vector<object> arguments;
 	for (const auto& arg : this->arguments)
@@ -65,7 +65,7 @@ recursive_function_node::recursive_function_node(node_ptr number) noexcept
 	: node(node_type::recursive_function), number(std::move(number))
 {}
 
-object recursive_function_node::eval(uh_status& status, std::shared_ptr<node> current_node)
+object recursive_function_node::eval(uh_status& status, const std::shared_ptr<node>&)
 {
 	const object number = this->number->eval(status, this->number);
 	const object number_c = number.type() == object_type::boolean ? static_cast<double>(number.get_as_boolean()) : number;
@@ -80,7 +80,7 @@ argument_node::argument_node(node_ptr index, node_ptr function_number) noexcept
 	: node(node_type::argument), index(std::move(index)), function_number(std::move(function_number))
 {}
 
-object argument_node::eval(uh_status& status, std::shared_ptr<node> current_node)
+object argument_node::eval(uh_status& status, const std::shared_ptr<node>&)
 {
 	const object index = this->index->eval(status, this->index);
 	const object index_c = index.type() == object_type::boolean ? static_cast<double>(index.get_as_number()) : index;
@@ -99,7 +99,7 @@ identifier_node::identifier_node(::module* module, std::u16string name) noexcept
 	: node(node_type::identifier), module(module), name(std::move(name))
 {}
 
-object identifier_node::eval(uh_status&, std::shared_ptr<node>)
+object identifier_node::eval(uh_status&, const std::shared_ptr<node>&)
 {
 	return module->functions().at(name);
 }

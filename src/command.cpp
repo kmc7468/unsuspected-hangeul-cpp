@@ -142,13 +142,14 @@ command command::parse(const std::u16string& code)
 	{
 		const char16_t c = code[i];
 		const bool is_high_surrogate = ::is_high_surrogate(c);
+		const bool is_hangul = !is_high_surrogate && ::is_hangul(c);
 
-		if ((is_high_surrogate || !is_hangul(c)) && result.size() && result.back() != command_type::none)
+		if ((is_high_surrogate || !is_hangul) && result.size() && result.back() != command_type::none)
 		{
 			result.push_back(command_type::none);
 			if (is_high_surrogate) ++i;
 		}
-		else if (is_hangul(c))
+		else if (is_hangul)
 		{
 			static const auto to_command_type = [](char16_t c)
 			{
@@ -167,6 +168,11 @@ command command::parse(const std::u16string& code)
 				default: return command_type::none; // Dummy
 				}
 			};
+			static const auto is_insert_space = [](command_type c)
+			{
+				return c == command_type::d || c == command_type::g;
+			};
+
 			const char32_t temp = get_chosung(c);
 
 			if (const char16_t first = static_cast<char16_t>(temp >> 16); first)
@@ -175,21 +181,14 @@ command command::parse(const std::u16string& code)
 
 				const command_type first_t = to_command_type(first),
 								   second_t = to_command_type(second);
-				const bool is_first_t_insert_space = first_t == command_type::d || first_t == command_type::g,
-						   is_second_t_insert_space = second_t == command_type::d || second_t == command_type::g;
 
-				if (result.size() && result.back() != command_type::none && is_first_t_insert_space) result.push_back(command_type::none);
-				result.push_back(first_t);
-				if (result.back() != command_type::none && is_second_t_insert_space) result.push_back(command_type::none);
-				result.push_back(second_t);
+				if (result.size() && result.back() != command_type::none && is_insert_space(first_t)) result.push_back(command_type::none); result.push_back(first_t);
+				if (result.back() != command_type::none && is_insert_space(second_t)) result.push_back(command_type::none); result.push_back(second_t);
 			}
 			else
 			{
 				const command_type t = to_command_type(static_cast<char16_t>(temp));
-				const bool is_t_insert_space = t == command_type::d || t == command_type::g;
-
-				if (result.size() && result.back() != command_type::none && is_t_insert_space) result.push_back(command_type::none);
-				result.push_back(t);
+				if (result.size() && result.back() != command_type::none && is_insert_space(t)) result.push_back(command_type::none); result.push_back(t);
 			}
 		}
 	}
@@ -198,5 +197,6 @@ command command::parse(const std::u16string& code)
 	{
 		result.erase(result.end() - 1);
 	}
+
 	return command;
 }
