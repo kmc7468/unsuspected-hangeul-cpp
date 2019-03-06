@@ -1,9 +1,10 @@
-#include <command.hpp>
+#include <interpreter.hpp>
+#include <object.hpp>
 
 int main(int argc, char** argv)
 {
-	std::u16string str = u"ㄴ ㄲ제 다 했다.";
-	command cmd = command::parse(str);
+	interpreter i;
+	const auto r = i.eval(u"ㅅ [ㄴ {ㄱㅇㄱ (ㄱㅇㄱ ㄴㄱ ㄷㅎㄷ ㄱㅇㅎㄴ) ㄱㅎㄷ} (ㄱㅇㄱ ㄷ ㅈㅎㄷ) ㅎㄷ] ㅎ ㅎㄴ");
 
 	return 0;
 }

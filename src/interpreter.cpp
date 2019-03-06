@@ -36,7 +36,7 @@ void uh_status::reset()
 		for (const auto& arg : args)
 		{
 			if (arg.type() == object_type::function) return 0.;
-			else result += arg.cast_as_number().get_as_number();
+			else result *= arg.cast_as_number().get_as_number();
 		}
 
 		return result;

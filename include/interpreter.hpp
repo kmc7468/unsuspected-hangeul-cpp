@@ -18,6 +18,7 @@ class function;
 class function_calling_node;
 class interpreter;
 class recursive_function_node;
+class native_function_param_t;
 class object;
 
 class uh_status final
@@ -27,6 +28,8 @@ class uh_status final
 	friend class function_calling_node;
 	friend class interpreter;
 	friend class recursive_function_node;
+	friend class native_function_param_t;
+	friend class object;
 
 private:
 	struct function_status

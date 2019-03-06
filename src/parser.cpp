@@ -53,11 +53,13 @@ object function_calling_node::eval(uh_status& status, const std::shared_ptr<node
 	std::vector<object> arguments;
 	for (const auto& arg : this->arguments)
 	{
-		arguments.push_back(arg->eval(status, arg));
+		if (arg->type() == node_type::function_calling) arguments.push_back(object(arg, status.call_stack_.size() - 1)/* lazy eval */);
+		else arguments.push_back(arg->eval(status, arg));
 	}
 
 	status.call_stack_.push_back(uh_status::function_status{ ::function(function->eval(status, function).get_as_function()), arguments });
-	const object result = status.call_stack_.back().function.eval(status);
+	object result = status.call_stack_.back().function.eval(status);
+	while (result.type() == object_type::lazy_eval) result = result.eval(status);
 	return status.call_stack_.erase(status.call_stack_.end() - 1), result;
 }
 
@@ -89,10 +91,13 @@ object argument_node::eval(uh_status& status, const std::shared_ptr<node>&)
 
 	if (index_c.type() != object_type::number || function_number_c.type() != object_type::number) return false;
 	if (status.call_stack_.size() <= function_number_c.get_as_number()) return false;
-	const uh_status::function_status& fstatus = status.call_stack_[status.call_stack_.size() - static_cast<std::size_t>(function_number_c.get_as_number()) - 1];
+	uh_status::function_status& fstatus = status.call_stack_[status.call_stack_.size() - static_cast<std::size_t>(function_number_c.get_as_number()) - 1];
 	
 	if (fstatus.arguments.size() <= index_c.get_as_number()) return false;
-	else return fstatus.arguments[fstatus.arguments.size() - static_cast<std::size_t>(index_c.get_as_number()) - 1];
+
+	object& argument = fstatus.arguments[fstatus.arguments.size() - static_cast<std::size_t>(index_c.get_as_number()) - 1];
+	if (argument.type() == object_type::lazy_eval) argument.eval(status);
+	return argument;
 }
 
 identifier_node::identifier_node(::module* module, std::u16string name) noexcept

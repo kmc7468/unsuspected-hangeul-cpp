@@ -1,5 +1,8 @@
 #include <object.hpp>
 
+#include <interpreter.hpp>
+#include <parser.hpp>
+
 #include <cassert>
 #include <utility>
 
@@ -11,6 +14,9 @@ object::object(function function) noexcept
 {}
 object::object(bool boolean) noexcept
 	: value_(boolean)
+{}
+object::object(node_ptr node, std::size_t call_stack_index) noexcept
+	: value_(std::make_tuple(std::move(node), call_stack_index))
 {}
 object::object(const object& object)
 	: value_(object.value_)
@@ -139,6 +145,22 @@ object object::cast_as_boolean() const
 	case object_type::number: return static_cast<bool>(get_as_number());
 	default: return *this;
 	}
+}
+
+object& object::eval(uh_status& status)
+{
+	assert(type() == object_type::lazy_eval);
+
+	const auto [current_node, call_stack_index] = std::get<std::tuple<node_ptr, std::size_t>>(value_);
+
+	std::vector<uh_status::function_status> temp(status.call_stack_.begin() + call_stack_index + 1, status.call_stack_.end());
+	status.call_stack_.erase(status.call_stack_.begin() + call_stack_index + 1, status.call_stack_.end());
+
+	*this = current_node->eval(status, current_node);
+	if (type() == object_type::lazy_eval) eval(status);
+
+	status.call_stack_.insert(status.call_stack_.end(), temp.begin(), temp.end());
+	return *this;
 }
 
 const object object::true_object = true;

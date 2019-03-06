@@ -2,6 +2,9 @@
 
 #include <function.hpp>
 
+#include <cstddef>
+#include <memory>
+#include <tuple>
 #include <variant>
 
 enum class object_type
@@ -11,7 +14,11 @@ enum class object_type
 	number,
 	function,
 	boolean,
+	lazy_eval,
 };
+
+class node;
+class uh_status;
 
 class object final
 {
@@ -20,6 +27,7 @@ public:
 	object(double number) noexcept;
 	object(function function) noexcept;
 	object(bool boolean) noexcept;
+	object(std::shared_ptr<node> node, std::size_t call_stack_index) noexcept;
 	object(const object& object);
 	object(object&& object) noexcept;
 	~object() = default;
@@ -49,8 +57,10 @@ public:
 	object cast_as_number() const;
 	object cast_as_boolean() const;
 
+	object& eval(uh_status& status);
+
 private:
-	std::variant<std::monostate, double, function, bool> value_;
+	std::variant<std::monostate, double, function, bool, std::tuple<std::shared_ptr<node>, std::size_t>> value_;
 
 public:
 	static const object true_object;
